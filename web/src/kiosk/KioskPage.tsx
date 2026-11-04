@@ -3,6 +3,7 @@ import { type Cart, fromLines, increment, normalizeEmployeeNo, toLines } from '.
 import {
   type ApiError,
   DEVICE_KEY_ERRORS,
+  type KioskCategory,
   type KioskItem,
   listItems,
   lookupEmployee,
@@ -12,6 +13,7 @@ import {
   type UseResultLine,
   useItems,
 } from '../lib/kioskApi';
+import { ALL, type CategoryTab, filterByCategory, normalizeTab, selectedCountByCategory } from '../lib/categories';
 import { EmployeeNoNotice } from '../lib/Notice';
 import { clearDeviceKey, loadDeviceKey } from '../lib/storage';
 import { imageUrl } from '../lib/supabase';
@@ -32,6 +34,8 @@ export function KioskPage() {
   const [deviceKey, setDeviceKey] = useState<string | null>(() => loadDeviceKey());
   const [keyReason, setKeyReason] = useState<string>();
   const [items, setItems] = useState<KioskItem[]>([]);
+  const [categories, setCategories] = useState<KioskCategory[]>([]);
+  const [tab, setTab] = useState<CategoryTab>(ALL);
   const [loading, setLoading] = useState(true);
   const [cart, setCart] = useState<Cart>({});
   const [step, setStep] = useState<Step>('select');
@@ -48,6 +52,8 @@ export function KioskPage() {
   const employeeInput = useRef<HTMLInputElement>(null);
 
   const itemById = useMemo(() => new Map(items.map((i) => [i.id, i])), [items]);
+  const shownItems = useMemo(() => filterByCategory(items, tab), [items, tab]);
+  const tabCounts = useMemo(() => selectedCountByCategory(items, cart), [items, cart]);
   const lines = toLines(cart);
 
   const handleApiError = useCallback((e: ApiError) => {
@@ -67,6 +73,9 @@ export function KioskPage() {
     setLoading(false);
     if (!r.ok) return handleApiError(r);
     setItems(r.items);
+    const cats = r.categories ?? [];
+    setCategories(cats);
+    setTab((t) => normalizeTab(t, cats));
   }, [deviceKey, handleApiError]);
 
   useEffect(() => {
@@ -83,6 +92,7 @@ export function KioskPage() {
     setError(null);
     setSource('manual');
     setRequestId(newRequestId());
+    setTab(ALL);
     setStep('select');
     refresh();
   }, [refresh]);
@@ -219,9 +229,29 @@ export function KioskPage() {
               </div>
             </section>
 
-            {loading ? <p className="muted">読み込み中…</p> : (
+            <nav className="category-tabs" role="tablist" aria-label="カテゴリ">
+              {[{ id: ALL as CategoryTab, name: 'すべて' }, ...categories].map((c) => {
+                const count = tabCounts.get(c.id) ?? 0;
+                return (
+                  <button
+                    key={String(c.id)}
+                    role="tab"
+                    aria-selected={tab === c.id}
+                    className={`category-tab ${tab === c.id ? 'active' : ''}`}
+                    onClick={() => setTab(c.id)}
+                  >
+                    {c.name}
+                    {count > 0 && <span className="tab-count" aria-label={`${count}品目選択中`}>{count}</span>}
+                  </button>
+                );
+              })}
+            </nav>
+
+            {loading ? <p className="muted">読み込み中…</p> : shownItems.length === 0 ? (
+              <p className="muted empty">このカテゴリの備品はありません。</p>
+            ) : (
               <section className="item-grid">
-                {items.map((item) => {
+                {shownItems.map((item) => {
                   const q = cart[item.id] ?? 0;
                   const out = item.stock <= 0;
                   return (

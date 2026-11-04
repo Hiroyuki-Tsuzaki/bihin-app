@@ -7,6 +7,14 @@ export interface Item {
   threshold: number;
   unit_price: number;
   account_title_id: number | null;
+  category_id: number | null;
+  sort_order: number;
+  is_active: boolean;
+}
+
+export interface ItemCategory {
+  id: number;
+  name: string;
   sort_order: number;
   is_active: boolean;
 }

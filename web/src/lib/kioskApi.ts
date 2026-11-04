@@ -10,6 +10,13 @@ export interface KioskItem {
   image_path: string | null;
   stock: number;
   low: boolean;
+  category_id: number | null;
+  category_name: string | null;
+}
+
+export interface KioskCategory {
+  id: number;
+  name: string;
 }
 
 export interface Shortage {
@@ -53,7 +60,8 @@ async function rpc<T>(fn: string, args: Record<string, unknown>): Promise<ApiRes
 
 export const verifyDeviceKey = (key: string) => rpc<object>('kiosk_verify_device_key', { p_device_key: key });
 
-export const listItems = (key: string) => rpc<{ items: KioskItem[] }>('kiosk_list_items', { p_device_key: key });
+export const listItems = (key: string) =>
+  rpc<{ items: KioskItem[]; categories?: KioskCategory[] }>('kiosk_list_items', { p_device_key: key });
 
 export const lookupEmployee = (key: string, employeeNo: string) =>
   rpc<{ employee_name: string }>('kiosk_lookup_employee', { p_device_key: key, p_employee_no: employeeNo });

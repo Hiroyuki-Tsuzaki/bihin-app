@@ -2,6 +2,7 @@ import { NavLink, Route, Routes } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { AccountTitlesPage } from './AccountTitlesPage';
 import { AdminsPage } from './AdminsPage';
+import { CategoriesPage } from './CategoriesPage';
 import { Dashboard } from './Dashboard';
 import { DeviceKeyPage } from './DeviceKeyPage';
 import { EmployeesPage } from './EmployeesPage';
@@ -18,6 +19,7 @@ const NAV: Array<[string, string]> = [
   ['restock', '補充'],
   ['usage', '利用状況'],
   ['items', '備品マスタ'],
+  ['categories', 'カテゴリマスタ'],
   ['employees', '社員マスタ'],
   ['account-titles', '仕訳マスタ'],
   ['report', '月次レポート'],
@@ -60,6 +62,7 @@ export function AdminApp() {
           <Route path="restock" element={<RestockPage />} />
           <Route path="usage" element={<UsagePage />} />
           <Route path="items" element={<ItemsPage />} />
+          <Route path="categories" element={<CategoriesPage />} />
           <Route path="employees" element={<EmployeesPage />} />
           <Route path="account-titles" element={<AccountTitlesPage />} />
           <Route path="report" element={<ReportPage />} />

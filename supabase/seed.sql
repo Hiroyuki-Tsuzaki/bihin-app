@@ -12,6 +12,14 @@ insert into public.items (name, unit, stock, threshold, unit_price, account_titl
   ('単3乾電池',              '本', 24, 12,  45,  (select id from public.account_titles where name = '消耗品費'),   5),
   ('単4乾電池',              '本',  6,  8,  48,  (select id from public.account_titles where name = '消耗品費'),   6);
 
+-- カテゴリの割り当て（カテゴリ自体はマイグレーションで作成済み）
+update public.items i set category_id = c.id
+  from public.item_categories c
+ where (i.name like 'コピー用紙%' and c.name = 'コピー用紙')
+    or (i.name like 'ボールペン%' and c.name = '文房具')
+    or (i.name like '付箋%'       and c.name = '文房具')
+    or (i.name like '単_乾電池'   and c.name = '家電');
+
 insert into public.employees (employee_no, name, email) values
   ('1001', '山田 太郎', 'yamada@example.com'),
   ('1002', '佐藤 花子', 'sato@example.com'),
