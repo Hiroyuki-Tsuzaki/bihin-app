@@ -188,7 +188,7 @@ export function KioskPage() {
       {error.shortages && (
         <ul>
           {error.shortages.map((s) => (
-            <li key={s.item_id}>{s.item_name}：希望 {s.requested}{s.unit} ／ 在庫 {s.stock}{s.unit}</li>
+            <li key={s.item_id}>{s.item_name}：希望 {s.requested}{s.unit} ／ 残り {s.stock}{s.unit}</li>
           ))}
         </ul>
       )}
@@ -262,7 +262,7 @@ export function KioskPage() {
                           : <div className="noimg">{item.name.slice(0, 2)}</div>}
                         <div className="item-name">{item.name}</div>
                         <div className="item-stock">
-                          在庫 {item.stock}{item.unit}
+                          残り {item.stock}{item.unit}
                           {out ? <span className="badge badge-danger">在庫なし</span> : item.low && <span className="badge badge-warn">残りわずか</span>}
                         </div>
                       </button>
@@ -287,7 +287,7 @@ export function KioskPage() {
             <p className="muted">入力：「{ai.text}」</p>
             {ai.lines.length === 0 ? <div className="alert alert-warn">登録できる備品を読み取れませんでした。</div> : (
               <table className="table">
-                <thead><tr><th>備品</th><th>数量</th><th>在庫</th><th /></tr></thead>
+                <thead><tr><th>備品</th><th>数量</th><th>残り</th><th /></tr></thead>
                 <tbody>
                   {ai.lines.map((l) => (
                     <tr key={l.item_id} className={l.quantity > l.stock ? 'row-danger' : ''}>
@@ -354,7 +354,7 @@ export function KioskPage() {
             <h2>✓ 受取を記録しました</h2>
             <p>{result.name} さん（{result.at}）</p>
             <table className="table">
-              <thead><tr><th>備品</th><th>数量</th><th>残り在庫</th></tr></thead>
+              <thead><tr><th>備品</th><th>数量</th><th>残り</th></tr></thead>
               <tbody>
                 {result.lines.map((l) => (
                   <tr key={l.item_id}>
